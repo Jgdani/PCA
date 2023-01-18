@@ -1,0 +1,129 @@
+#################### PCA ######################
+dados<-read.csv("C:/Users/Julia/Documents/analises_sisyrinchium/cluster/dadosvag.csv", sep=",", dec=",")
+library(plotly)
+library(stats)
+library(ggplot2)
+
+X <- subset(dados, select = -c(Specie))
+prin_comp <- prcomp(X, rank. = 2)
+components <- prin_comp[["x"]]
+components <- data.frame(components)
+components <- cbind(components, dados$Specie)
+components$PC2 <- -components$PC2
+png(file='pcavag.jpeg', width= 100, height = 100, units='cm', res= 500)
+fig <- plot_ly(components, x = ~PC1, y = ~PC2, color = ~dados$Specie, colors = c('#7B1B37','#21570E','#1D4940','#E5A411','#E17AA2'), type = 'scatter', mode = 'markers')%>%
+  layout(
+    legend=list(title=list(text='color')),
+    plot_bgcolor='#e5ecf6', #cor fundo do grÃ¡fico
+    xaxis = list(
+      title = "0",
+      zerolinecolor = "#ffff",
+      zerolinewidth = 2,
+      gridcolor='#ffff'),
+    yaxis = list(
+      title = "1",
+      zerolinecolor = "#ffff",
+      zerolinewidth = 2,
+      gridcolor='#ffff'))
+fig
+dev.new()
+
+dev.off()
+png(file='pcavag.jpeg', width= 100, height = 100, units='cm', res= 500)
+fig
+dev.off()
+ggsave('pcavag2.png', plot= fig (), width = NA, height =NA, units = c('cm'))
+
+library(plotly)
+
+
+axis = list(showline=FALSE,
+            zeroline=FALSE,
+            gridcolor='#ffff',
+            ticklen=4,
+            titlefont=list(size=13))
+
+
+
+################# GrÃ¡fico tridimensional ##############################
+dados
+
+X <- subset(dados, select = -c(Specie))
+
+prin_comp <- prcomp(X, rank. = 3)
+
+components <- prin_comp[["x"]]
+components <- data.frame(components)
+components$PC2 <- -components$PC2
+components$PC3 <- -components$PC3
+components = cbind(components, dados$Specie)
+
+tot_explained_variance_ratio <- summary(prin_comp)[["importance"]]['Proportion of Variance',]
+tot_explained_variance_ratio <- 100 * sum(tot_explained_variance_ratio)
+
+tit = 'Total Explained Variance = 99.48'
+
+fig <- plot_ly(components, x = ~PC1, y = ~PC2, z = ~PC3, color = ~dados$Specie, colors = c('#7B1B37','#21570E','#1D4940','#E5A411','#E17AA2') ) %>%
+  add_markers(size = 12)
+
+
+fig <- fig %>%
+  layout(
+    title = tit,
+    scene = list(bgcolor = "#e5ecf6")
+  )
+
+fig
+dev.new()
+
+
+############ vizualizando todos os componentes principais ############
+
+library(plotly)
+library(stats)
+dados
+X <- subset(dados, select = -c(Specie))
+prin_comp <- prcomp(X)
+explained_variance_ratio <- summary(prin_comp)[["importance"]]['Proportion of Variance',]
+explained_variance_ratio <- 100 * explained_variance_ratio
+components <- prin_comp[["x"]]
+components <- data.frame(components)
+components <- cbind(components, dados$Specie)
+components$PC3 <- -components$PC3
+components$PC2 <- -components$PC2
+
+axis = list(showline=FALSE,
+            zeroline=FALSE,
+            gridcolor='#ffff',
+            ticklen=4,
+            titlefont=list(size=13))
+
+fig <- components %>%
+  plot_ly()  %>%
+  add_trace(
+    type = 'splom',
+    dimensions = list(
+      list(label=paste('PC 1 (',toString(round(explained_variance_ratio[1],1)),'%)',sep = ''), values=~PC1),
+      list(label=paste('PC 2 (',toString(round(explained_variance_ratio[2],1)),'%)',sep = ''), values=~PC2),
+      list(label=paste('PC 3 (',toString(round(explained_variance_ratio[3],1)),'%)',sep = ''), values=~PC3),
+      list(label=paste('PC 4 (',toString(round(explained_variance_ratio[4],1)),'%)',sep = ''), values=~PC4)
+    ),
+    color = ~dados$Specie, colors = c('#7B1B37','#21570E','#1D4940','#E5A411','#E17AA2')
+  ) %>%
+  style(diagonal = list(visible = FALSE)) %>%
+  layout(
+    legend=list(title=list(text='color')),
+    hovermode='closest',
+    dragmode= 'select',
+    plot_bgcolor='rgba(240,240,240, 0.95)',
+    xaxis=list(domain=NULL, showline=F, zeroline=F, gridcolor='#ffff', ticklen=4),
+    yaxis=list(domain=NULL, showline=F, zeroline=F, gridcolor='#ffff', ticklen=4),
+    xaxis2=axis,
+    xaxis3=axis,
+    xaxis4=axis,
+    yaxis2=axis,
+    yaxis3=axis,
+    yaxis4=axis
+  )
+
+fig
