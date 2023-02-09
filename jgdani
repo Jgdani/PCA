@@ -1,17 +1,29 @@
 #################### PCA ######################
-dados<-read.csv("C:/Users/Julia/Documents/analises_sisyrinchium/cluster/dadosvag.csv", sep=",", dec=",")
+dados<-read.csv("C:/Users/Julia/Documents/analises_sisyrinchium/cluster/medvagf.csv", sep=",", dec=",")
 library(plotly)
 library(stats)
 library(ggplot2)
 
-X <- subset(dados, select = -c(Specie))
+dadoss<- dados [,-1]
+
+#calculate principal components
+results <- prcomp(dados, scale = TRUE)
+
+#reverse the signs
+results$rotation <- -3*results$rotation
+
+#display principal components
+results$rotation
+
+
+X <- subset(dados, select = -c(Especie))
 prin_comp <- prcomp(X, rank. = 2)
 components <- prin_comp[["x"]]
 components <- data.frame(components)
-components <- cbind(components, dados$Specie)
+components <- cbind(components, dados$Especie)
 components$PC2 <- -components$PC2
 png(file='pcavag.jpeg', width= 100, height = 100, units='cm', res= 500)
-fig <- plot_ly(components, x = ~PC1, y = ~PC2, color = ~dados$Specie, colors = c('#7B1B37','#21570E','#1D4940','#E5A411','#E17AA2'), type = 'scatter', mode = 'markers')%>%
+fig <- plot_ly(components, x = ~PC1, y = ~PC2, color = ~dados$Especie, colors = c('#7B1B37','#21570E','#1D4940','#E5A411','#E17AA2'), type = 'scatter', mode = 'markers')%>%
   layout(
     legend=list(title=list(text='color')),
     plot_bgcolor='#e5ecf6', #cor fundo do grÃ¡fico
@@ -48,7 +60,7 @@ axis = list(showline=FALSE,
 ################# GrÃ¡fico tridimensional ##############################
 dados
 
-X <- subset(dados, select = -c(Specie))
+X <- subset(dados, select = -c(Especie))
 
 prin_comp <- prcomp(X, rank. = 3)
 
@@ -56,14 +68,14 @@ components <- prin_comp[["x"]]
 components <- data.frame(components)
 components$PC2 <- -components$PC2
 components$PC3 <- -components$PC3
-components = cbind(components, dados$Specie)
+components = cbind(components, dados$Especie)
 
 tot_explained_variance_ratio <- summary(prin_comp)[["importance"]]['Proportion of Variance',]
 tot_explained_variance_ratio <- 100 * sum(tot_explained_variance_ratio)
 
 tit = 'Total Explained Variance = 99.48'
 
-fig <- plot_ly(components, x = ~PC1, y = ~PC2, z = ~PC3, color = ~dados$Specie, colors = c('#7B1B37','#21570E','#1D4940','#E5A411','#E17AA2') ) %>%
+fig <- plot_ly(components, x = ~PC1, y = ~PC2, z = ~PC3, color = ~dados$Especie, colors = c('#7B1B37','#21570E','#1D4940','#E5A411','#E17AA2') ) %>%
   add_markers(size = 12)
 
 
@@ -82,13 +94,13 @@ dev.new()
 library(plotly)
 library(stats)
 dados
-X <- subset(dados, select = -c(Specie))
+X <- subset(dados, select = -c(Especie))
 prin_comp <- prcomp(X)
 explained_variance_ratio <- summary(prin_comp)[["importance"]]['Proportion of Variance',]
 explained_variance_ratio <- 100 * explained_variance_ratio
 components <- prin_comp[["x"]]
 components <- data.frame(components)
-components <- cbind(components, dados$Specie)
+components <- cbind(components, dados$Especie)
 components$PC3 <- -components$PC3
 components$PC2 <- -components$PC2
 
@@ -108,7 +120,7 @@ fig <- components %>%
       list(label=paste('PC 3 (',toString(round(explained_variance_ratio[3],1)),'%)',sep = ''), values=~PC3),
       list(label=paste('PC 4 (',toString(round(explained_variance_ratio[4],1)),'%)',sep = ''), values=~PC4)
     ),
-    color = ~dados$Specie, colors = c('#7B1B37','#21570E','#1D4940','#E5A411','#E17AA2')
+    color = ~dados$Especie, colors = c('#7B1B37','#21570E','#1D4940','#E5A411','#E17AA2')
   ) %>%
   style(diagonal = list(visible = FALSE)) %>%
   layout(
@@ -125,5 +137,4 @@ fig <- components %>%
     yaxis3=axis,
     yaxis4=axis
   )
-
 fig
