@@ -138,3 +138,51 @@ fig <- components %>%
     yaxis4=axis
   )
 fig
+
+
+#############################################################################################
+dadoss<-read.csv("C:/Users/Julia/Documents/analises_sisyrinchium/cluster/medvagf.csv", sep=",", dec=",")
+library(plotly)
+library(stats)
+library(ggplot2)
+
+dados<- dadoss [,-1]
+
+#calculate principal components
+results <- prcomp(dados, scale = TRUE)
+
+#reverse the signs
+results2<- -3*results$rotation
+
+#display principal components
+
+png(file="C:/Users/Julia/Documents/analises_sisyrinchium/cluster/PCAFinal2.png",
+    width=500, height=350)
+PCA <- results$rotation
+plot(PCA)
+X <- subset(dadoss, select = -c(Especie))
+prin_comp <- prcomp(dados, scale = TRUE)
+components <- prin_comp[["x"]]
+components <- data.frame(components)
+components <- cbind(components, dadoss$Especie)
+components$PC2 <- -components$PC2
+png(file='pcavag.jpeg', width= 100, height = 100, units='cm', res= 500)
+fig <- plot_ly(components, x = ~PC1, y = ~PC2, color = ~dadoss$Especie, colors = c('#359900','#D60D00','#10A2A6','#1C4042','#DFA327', '#9B003C'), type = 'scatter', mode = 'markers')%>%
+  layout(
+    legend=list(title=list(text='color')),
+    plot_bgcolor='#e5ecf6', #cor fundo do grÃ¡fico
+    xaxis = list(
+      title = "PC1 51.4%",
+      zerolinecolor = "#ffff",
+      zerolinewidth = 2,
+      gridcolor='#ffff'),
+    yaxis = list(
+      title = "PC2 24.3%",
+      zerolinecolor = "#ffff",
+      zerolinewidth = 2,
+      gridcolor='#ffff'))
+fig
+
+dev.off()
+
+
